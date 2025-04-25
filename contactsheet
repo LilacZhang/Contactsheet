@@ -1,0 +1,46 @@
+#!/bin/zsh
+#Add a border to the photo and compress it to 1080x1080 resolution
+#Combine all the photos in the folder and generate a 1080x1080 resolution photo
+target_folder="$1"
+
+# 创建子文件夹 resized（如果不存在）
+mkdir -p "$target_folder/resized"
+
+# 遍历所有 .jpg 文件
+find "$target_folder" -type f -name "*.jpg" | while read -r file; do
+    dir=$(dirname "$file")
+    mkdir -p "$dir/resized"
+
+    # 获取原始文件的文件名（包含扩展名）
+    filename=$(basename "$file")
+
+    # 设置新文件的路径和名称
+    new_file="$dir/resized/$filename"
+
+    # 使用 ImageMagick 进行图片处理
+    magick "$file" -resize "x1060>"  -bordercolor black -border 10 "$new_file"
+
+    # magick "$file" -resize 1080x1080^ -gravity center -background black -extent 1080x1080 -bordercolor black -border 5x5 "$new_file"
+done
+
+# 在 $target_folder 下的 resized 目录中操作
+cd "$target_folder/resized" || exit
+
+# 初始化文件路径字符串
+file_paths=()
+
+# 读取所有文件并保留特殊字符（空格等）
+# find "$(pwd)" -type f -name "*.jpg" -print0 | while IFS= read -r -d '' file; do
+#     file_paths+=("$file")
+# done
+find "$(pwd)" -type f -name "*.jpg" -print0 | sort -z | while IFS= read -r -d '' file; do
+    file_paths+=("$file")
+done
+# 使用 montage 命令生成拼接的图片
+montage "${file_paths[@]}" -geometry +0+0 -resize "x1080^>" contactsheet.jpg
+mv contactsheet.jpg  $target_folder/contactsheet.jpg
+
+echo "拼接图片已生成: $(pwd)/contactsheet.jpg"
+
+rm -rf $target_folder/resized
+open $target_folder/contactsheet.jpg
