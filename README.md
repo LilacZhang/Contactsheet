@@ -9,7 +9,7 @@
 - Stitch the processed images into a single ×1080px contact sheet.
 
 ## Preview
-![Contactsheet](https://lilac-1315215436.cos.ap-guangzhou.myqcloud.com/img/202504251403978.jpg)
+![Contactsheet](fig/contactsheet.jpg)
 
 ## Requirements
 
